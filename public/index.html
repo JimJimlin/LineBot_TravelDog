@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leaflet Practice</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+    <link rel="stylesheet" href="../dist/leaflet.awesome-markers.css">
+    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="MarkerCluster.css"/>
+
+    <script src="index.js"></script>
+    <script src="map.js"></script>
+
+    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+    <script src="../dist/leaflet-realtime.js"></script>
+
+    <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
+    <script src="../dist/leaflet.awesome-markers.js"></script>
+
+    <script src="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"></script>
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script type="text/javascript" src="../MovingMarker.js"></script>
+
+    <script src="leaflet.markercluster.js"></script>
+
+</head>
+<body>
+    <div id="map" position="relative" style="width: 1260px; height: 700px"></div>
+
+    <script>
+
+        var map = L.map('map').setView([25.04028063064491, 121.5577727821931], 13),realtime = L.realtime({
+        url: '/pathgen',
+        crossOrigin: true,
+        type: 'json'
+        }, {
+        interval: 3 * 1000
+        }).addTo(map);
+
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+                '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            id: 'mapbox.streets'
+        }).addTo(map);
+
+        var ManMarker = L.AwesomeMarkers.icon({
+        icon: 'icon ion-ios-body',
+        markerColor: 'blue',
+        });
+
+        $.getJSON("http://localhost:9487/json",function(data){
+            var test = L.geoJson(data,{
+                pointToLayer: function(feature,latlng){
+                var marker = L.marker(latlng,{icon: ManMarker});
+                marker.bindPopup('Hi, I am here');
+                return marker;
+                }
+            }).addTo(map);
+
+        var clusters = L.markerClusterGroup();
+        clusters.addLayer(test);
+        map.addLayer(clusters);
+
+        });
+
+    </script>
+
+</body>
+</html>
